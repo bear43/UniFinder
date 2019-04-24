@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap.datepicker-fork/1.3.0/js/locales/bootstrap-datepicker.ru.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Finder</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav navbar-right">
+                <form id="log_out_form" th:action="@{/logout}" method="post">
+                </form>
+                <li class="navbar-link"><a href="#" id="log_out">Выйти</a></li>
+                <script>
+                    $("#log_out").on("click", function ()
+                    {
+                        $("#log_out_form").submit();
+                    });
+                </script>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div th:if="${message} != null">
+        [[${message}]]
+    </div>
+    <div id="regexp">
+        <label id="regexp-text" class="text-danger"></label>
+    </div>
+    <h1>Смена пароля</h1>
+    <form th:action="@{/pass_change}" method="post">
+        <div class="form-group">
+            <input class="form-control" type="password" name="newpassword" required placeholder="Новый пароль"/>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="againpassword" required placeholder="Подтверждение пароля"/>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary center-block" type="submit" value="Изменить"/>
+        </div>
+    </form>
+</div>
+</body>
+</html>

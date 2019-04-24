@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Finder</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="navbar-link"><a href="/login">Войти</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div th:if="${message} != null">
+        [[${message}]]
+    </div>
+    <div id="regexp">
+        <label id="regexp-text" class="text-danger"></label>
+    </div>
+    <label>Аккаунт ВУЗа: <input type="radio" id="myCheck1" onclick="check1()"></label>
+    <label>Аккаунт студента: <input type="radio" id="myCheck2" onclick="check2()"></label>
+    <div id="student">
+        <form th:action="@{/registration}" method="post">
+            <div class="form-group">
+                <input class="form-control" type="text" name="name" required placeholder="Логин"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="password" required placeholder="Пароль"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="firstname" required placeholder="Имя"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="secondname" required placeholder="Фамилия"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="patronymic" required placeholder="Отчество"/>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary center-block" type="submit" value="Зарегистрировать"/>
+            </div>
+        </form>
+    </div>
+    <div id="university">
+        <form th:action="@{/registration}" method="post">
+            <div class="form-group">
+                <input class="form-control" type="text" name="name" required placeholder="Логин"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="password" required placeholder="Пароль"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="firstname" required placeholder="Имя"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="secondname" required placeholder="Фамилия"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="patronymic" required placeholder="Отчество"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="title" required placeholder="Название ВУЗа"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="number" placeholder="Номер телефона"/>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="profile" placeholder="Профиль ВУЗа"/>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary center-block" type="submit" value="Зарегистрировать"/>
+            </div>
+        </form>
+    </div>
+    <script>
+        $( document ).ready(function() {
+            $("#university").toggle("slide");
+            $("#student").toggle("slide");
+            $("#myCheck1").prop("checked", false);
+            $("#myCheck2").prop("checked", false);
+        });
+        var a = false,b = false;
+        function check1()
+        {
+            if(!a)
+            {
+                $("#university").toggle("slide");
+                $("#myCheck2").prop("checked", false);
+                a = true;
+                if(b)
+                    $("#student").toggle("slide");
+                b = false;
+            }
+        }
+        function check2()
+        {
+            if(!b)
+            {
+                $("#student").toggle("slide");
+                $("#myCheck1").prop("checked", false);
+                b = true;
+                if(a)
+                    $("#university").toggle("slide");
+                a = false;
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
