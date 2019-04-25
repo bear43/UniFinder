@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import service.UniversityService;
 import service.UserService;
 
 import java.util.Map;
@@ -16,38 +17,48 @@ public class AuthController
 {
     private final UserService userService;
 
+    private final UniversityService universityService;
+
     @Autowired
-    public AuthController(UserService userService)
+    public AuthController(UserService userService, UniversityService universityService)
     {
         this.userService = userService;
+        this.universityService = universityService;
     }
 
-    @GetMapping("/login")
+    @GetMapping("login")
     public String login(Map<String, Object> model)
     {
         return "login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public String login(String message, Map<String, Object> model)
     {
         model.put("message", message);
         return "login";
     }
 
-    @GetMapping("/registration")
+    @GetMapping("registration")
     public String registration()
     {
         return "registration";
     }
 
-    @PostMapping("/registration")
-    public String registration_student(User user, University university, Map<String, Object> model, RedirectAttributes attr)
+    @PostMapping("registration")
+    public String registration(User user, University university, Map<String, Object> model, RedirectAttributes attr)
     {
         if(user != null)
         {
             if(university.getTitle() != null)
+            {
+                if(universityService.doesUniveristyExistsByTitle(university.getTitle()))
+                {
+                    model.put("message", "Название данного ВУЗа уже используется!");
+                    return "registration";
+                }
                 user.setUniversity(university);
+            }
             if(userService.getUserRepository().findByName(user.getName()) != null)
             {
                 model.put("message", "Пользователь с таким логином уже зарегистрированн!");
@@ -84,20 +95,20 @@ public class AuthController
         return "registration";
     }
 
-    @GetMapping("/user_cabinet")
+    @GetMapping("user_cabinet")
     public String user_cabinet(Map<String, Object> model, RedirectAttributes attr)
     {
         model.putIfAbsent("user", userService.getCurrentUser());
         return "user_cabinet";
     }
 
-    @PostMapping("/user_cabinet")
+    @PostMapping("user_cabinet")
     public String user_cabinet(String message, Map<String, Object> model)
     {
         return "user_cabinet";
     }
 
-    @PostMapping("/pass_change")
+    @PostMapping("pass_change")
     public String pass_change(String newpassword, String againpassword, Map<String, Object> model, RedirectAttributes attr)
     {
         if(!newpassword.equals(againpassword))

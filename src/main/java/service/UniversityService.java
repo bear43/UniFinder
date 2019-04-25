@@ -16,8 +16,15 @@ public class UniversityService
         this.universityRepository = universityRepository;
     }
 
-    public void createUniversity(University university)
+    public boolean doesUniveristyExistsByTitle(String title)
     {
+        return universityRepository.findByTitle(title) != null;
+    }
+
+    public void createUniversity(University university) throws Exception
+    {
+        if(doesUniveristyExistsByTitle(university.getTitle()))
+            throw new Exception("Server with this name already exists");
         universityRepository.saveAndFlush(university);
     }
 

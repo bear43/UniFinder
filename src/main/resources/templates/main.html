@@ -10,6 +10,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Главная страница</title>
 </head>
 <body>
@@ -41,6 +43,45 @@
     <div th:if="${message} != null">
         <label class="text-info">[[${message}]]</label>
     </div>
+    <div th:if="${user.getUniversity()} != null">
+        <h1 th:text="${user.getUniversity().getTitle()}"></h1>
+
+    </div>
+    <div th:if="${user.getUniversity()} == null">
+        <div id="uniBrowser">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th class="col-md-3">Название</th>
+                    <th class="col-md-3">Адрес</th>
+                    <th class="col-md-3">Номер телефона</th>
+                    <th class="col-md-3">Профиль</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="university : ${universities}">
+                    <tr>
+                        <td class="col-md-3 unititle" th:text="${university.getTitle()}"></td>
+                        <td class="col-md-3" th:text="${university.getAddress()}"></td>
+                        <td class="col-md-3" th:text="${university.getNumber()}"></td>
+                        <td class="col-md-3" th:text="${university.getProfile()}"></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+        <form id="formOut" th:action="@{/university_info}" method="post">
+            <input id="formValue" type="hidden" name="title" />
+        </form>
+    </div>
+    <script>
+        $(".unititle").on("click", function (a)
+        {
+            var title = a.target.innerText;
+            $("#formValue").prop("value", title);
+            $("#formOut").submit();
+        });
+    </script>
 </div>
 </body>
 </html>

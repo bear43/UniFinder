@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/bootstrap.datepicker-fork/1.3.0/js/locales/bootstrap-datepicker.ru.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет</title>
+    <title>Информация об университете</title>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -22,6 +22,9 @@
             <a class="navbar-brand" href="/">Finder</a>
         </div>
         <div>
+            <ul class="nav navbar-nav">
+                <li class="navbar-link"><a href="/user_cabinet">Личный кабинет</a></li>
+            </ul>
             <ul class="nav navbar-nav navbar-right">
                 <form id="log_out_form" th:action="@{/logout}" method="post">
                 </form>
@@ -40,21 +43,35 @@
     <div th:if="${message} != null">
         [[${message}]]
     </div>
-    <div id="regexp">
-        <label id="regexp-text" class="text-danger"></label>
+    <div th:if="${university} != null">
+    <h1>Специализации:</h1>
+        <div th:if="${university.getSpecializations()} != null and ${university.getSpecializations().size()} != 0">
+            <th:block th:each="specialization : ${university.getSpecializations()}">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th class="col-md-3">Название</th>
+                        <th class="col-md-3">Требования</th>
+                        <th:block th:each="condition : ${specialization.getConditions()}">
+                            <th class="col-md-3" th:text="${condition.getSubject().toString()}"></th>
+                        </th:block>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col-md-3" th:text="${specialization.getTitle()}"></td>
+                            <th:block th:each="condition : ${specialization.getConditions()}">
+                                <td class="col-md-3" th:text="${condition.getPointsCount()}"></td>
+                            </th:block>
+                        </tr>
+                    </tbody>
+                </table>
+            </th:block>
+        </div>
+        <div th:if="${university.getSpecializations()} == null or ${university.getSpecializations().size()} == 0">
+            <h1>Нет специализаций!</h1>
+        </div>
     </div>
-    <h1>Смена пароля</h1>
-    <form th:action="@{/pass_change}" method="post">
-        <div class="form-group">
-            <input class="form-control" type="password" name="newpassword" required placeholder="Новый пароль"/>
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="againpassword" required placeholder="Подтверждение пароля"/>
-        </div>
-        <div class="form-group">
-            <input class="btn btn-primary center-block" type="submit" value="Изменить"/>
-        </div>
-    </form>
 </div>
 </body>
 </html>
