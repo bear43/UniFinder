@@ -19,7 +19,7 @@ public class University
 
     private String profile;
 
-    @OneToMany(mappedBy = "university")
+    @OneToMany(mappedBy = "university", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Set<Specialization> specializations = new HashSet<>();
 
     protected University()

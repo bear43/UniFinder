@@ -16,9 +16,11 @@ public class SubjectService
         this.subjectRepository = subjectRepository;
     }
 
-    public Subject createNewSubject(String title)
+    public Subject createNewSubject(String title) throws Exception
     {
         Subject subj = new Subject(title);
+        Subject copy = subjectRepository.findByTitle(title);
+        if(copy != null) throw new Exception("Subject is already defined");
         subjectRepository.saveAndFlush(subj);
         return subj;
     }
@@ -29,5 +31,10 @@ public class SubjectService
         if(subj != null)
             subjectRepository.delete(subj);
         return subj != null;
+    }
+
+    public SubjectRepository getSubjectRepository()
+    {
+        return subjectRepository;
     }
 }

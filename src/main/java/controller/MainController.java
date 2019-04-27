@@ -1,13 +1,12 @@
 package controller;
 
-import model.University;
+import model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.*;
 
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -38,6 +37,7 @@ public class MainController
     {
         model.put("user", userService.getCurrentUser());
         model.put("universities", universityService.getUniversityRepository().findAll());
+        model.put("subjects", subjectService.getSubjectRepository().findAll());
         return "main";
     }
 
@@ -55,5 +55,48 @@ public class MainController
             attr.addFlashAttribute("message", "Не удалось найти ВУЗ с данным названием: '" + title + "'!");
             return "redirect:/";
         }
+    }
+
+    @GetMapping("/add_specialization")
+    public String add_specialization(Map<String, Object> model, RedirectAttributes attr)
+    {
+        model.put("university", userService.getCurrentUser().getUniversity());
+        model.put("subjects", subjectService.getSubjectRepository().findAll());
+        return "add_specialization";
+    }
+
+    @PostMapping("/add_subject")
+    public String add_subject(String title, Map<String, Object> model, RedirectAttributes attr)
+    {
+        if(title != null && !title.isEmpty())
+        {
+            try
+            {
+                subjectService.createNewSubject(title);
+            }
+            catch (Exception ex)
+            {
+                attr.addFlashAttribute("message", "Ошибка: " + ex.getMessage());
+                return "redirect:/add_specialization";
+            }
+            attr.addFlashAttribute("message", "Предмет успешно добавлен!");
+        }
+        else
+        {
+            attr.addFlashAttribute("message", "Не могу создать предмет с пустым названием!");
+        }
+        return "redirect:/add_specialization";
+    }
+
+    @PostMapping("/add_condition")
+    public String add_condition(@RequestBody ConditionJSONList specialization, RedirectAttributes attr) throws Exception
+    {
+        userService.getCurrentUser().getUniversity().getSpecializations().
+                add(specializationService.
+                        createFromJSONSpecializationToSpecialization(specialization,
+                                userService.getCurrentUser().getUniversity()));
+        userService.saveAndFlush();
+        attr.addFlashAttribute("message", "Специальность успешно добавлена!");
+        return "redirect:/add_specialization";
     }
 }

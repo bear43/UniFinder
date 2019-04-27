@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+    <title>Добавить специализацию</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Finder</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="navbar-link"><a href="/user_cabinet">Личный кабинет</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <form id="log_out_form" th:action="@{/logout}" method="post">
+                </form>
+                <li class="navbar-link"><a href="#" id="log_out">Выйти</a></li>
+                <script>
+                    $("#log_out").on("click", function ()
+                    {
+                        $("#log_out_form").submit();
+                    });
+                </script>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div th:if="${message} != null">
+        [[${message}]]
+    </div>
+    <label>Название специальности:
+        <input type="text" id="specTitle" name="t" placeholder="Название" min="1" /></label>
+    <br/>
+    <label id="subjectCount">Количество предметов:
+        <input type="number" id="counter" name="count" placeholder="Количество" min="1" value="1" /></label>
+    <br/>
+    <div id="subjectChooseDiv">
+        <div class="inst">
+            <label class="subjectChoose">
+                Выберите предмет:
+                <select th:if="${subjects} != null and ${subjects.size()} != 0">
+                    <th:block th:each="subject : ${subjects}">
+                        <option th:text="${subject.toString()}"></option>
+                    </th:block>
+                </select>
+                <input type="number" name="pointsCount" id="pcount" placeholder="Балл" min="0"/>
+            </label>
+            <br/>
+        </div>
+        <input id="add_spec" type="button" value="Добавить специализацию"/>
+    </div>
+    <form th:action="@{/add_subject}" method="post">
+        <label>Добавить предмет: <input class="form-control" type="text" name="title" placeholder="Название предмета"/></label>
+        <input class="btn btn-primary" type="submit" value="Добавить"/>
+    </form>
+    <script>
+        var copied = false;
+        var template;
+        var count = 1;
+        $( document ).ready(function()
+        {
+            if(!copied)
+            {
+                template = $(".inst")[0].outerHTML;
+                copied = true;
+            }
+        });
+        $("#counter").on("change", function (a)
+        {
+            if(a.target.value < 1) return;
+            if(copied)
+            {
+                while(count != a.target.value)
+                {
+                    if (count < a.target.value)
+                    {
+                        $(".inst").last().after(template);
+                        count++;
+                    }
+                    else if (count > a.target.value)
+                    {
+                        $(".inst").last().remove();
+                        count--;
+                    }
+                }
+            }
+        })
+        $("#add_spec").on("click", function ()
+        {
+            if($("#specTitle")[0].value.length === 0)
+            {
+                alert("Заполните название специальности");
+                return;
+            }
+            if($("#pcount")[0].value.length === 0)
+            {
+                alert("Введите каждому предмету соответствующее количество баллов!");
+                return;
+            }
+            var arr = [];
+            var current;
+            for(var i in $(".subjectChoose"))
+            {
+                if(i == "length") break;
+                current = {};
+                current.subject = $(".subjectChoose")[i].children[0].value;
+                current.value = $(".subjectChoose")[i].children[1].value;
+                arr.push(current);
+            }
+            $.ajax({
+                url: "/add_condition",
+                type: "POST",
+                data: JSON.stringify({
+                    title: $("#specTitle")[0].value,
+                    conditions: arr}),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                dataType: "json"
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

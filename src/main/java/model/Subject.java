@@ -3,6 +3,7 @@ package model;
 import org.hibernate.mapping.Bag;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class Subject
     private String title;
 
     @OneToMany(mappedBy = "subject")
-    private List<Condition> conditions;
+    private List<Condition> conditions = new ArrayList<>();
 
     protected Subject()
     {}
@@ -27,7 +28,35 @@ public class Subject
         this.title = title;
     }
 
+    public Long getId()
+    {
+        return id;
+    }
 
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public List<Condition> getConditions()
+    {
+        return conditions;
+    }
+
+    public void setConditions(List<Condition> conditions)
+    {
+        this.conditions = conditions;
+    }
 
     @Override
     public String toString()

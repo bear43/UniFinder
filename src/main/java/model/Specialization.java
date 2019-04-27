@@ -13,8 +13,8 @@ public class Specialization
 
     private String title;
 
-    @OneToMany(mappedBy = "specialization")
-    private Set<Condition> conditions;
+    @OneToMany(mappedBy = "specialization", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private Set<Condition> conditions = new HashSet<>();
 
     @ManyToOne
     private University university;
@@ -78,6 +78,8 @@ public class Specialization
     {
         this.university = university;
     }
+
+
 
     @Override
     public String toString()

@@ -10,8 +10,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <!--<meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
     <title>Главная страница</title>
 </head>
 <body>
@@ -45,7 +45,23 @@
     </div>
     <div th:if="${user.getUniversity()} != null">
         <h1 th:text="${user.getUniversity().getTitle()}"></h1>
-
+        <h1>Специализации:</h1>
+        <div th:if="${user.getUniversity().getSpecializations() != null and user.getUniversity().getSpecializations().size() != 0}">
+            <th:block th:each="specialization : ${user.getUniversity().getSpecializations()}">
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="col-sm-1" th:text="${specialization.getTitle()}"></td>
+                            <th:block th:each="condition : ${specialization.getConditions()}">
+                                <td class="col-sm-1" th:if="${condition} != null" th:text="${condition.getSubject().toString()}">Предмет</td>
+                                <td class="col-sm-1" th:if="${condition} != null" th:text="${condition.getPointsCount()}">Баллы</td>
+                            </th:block>
+                        </tr>
+                    </tbody>
+                </table>
+            </th:block>
+        </div>
+        <a th:href="@{/add_specialization}">Добавить специализацию</a>
     </div>
     <div th:if="${user.getUniversity()} == null">
         <div id="uniBrowser">
