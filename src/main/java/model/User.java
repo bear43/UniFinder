@@ -30,7 +30,7 @@ public class User
 
     private String patronymic;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private University university;
 
     protected User()

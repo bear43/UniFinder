@@ -26,7 +26,7 @@ public class UserService
 
     public User getCurrentUserByLogin()
     {
-        return getCurrentUserByLogin((String)SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        return getCurrentUserByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
     }
 
     public void fillCurrentUser(String username)

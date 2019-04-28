@@ -4,18 +4,31 @@ import java.util.List;
 
 public class ConditionJSONList
 {
+    private Long id;
+
     private String title;
 
     private List<ConditionJSON> conditions;
 
-    public ConditionJSONList(String title, List<ConditionJSON> conditions)
+    public ConditionJSONList(Long id, String title, List<ConditionJSON> conditions)
     {
+        this.id = id;
         this.title = title;
         this.conditions = conditions;
     }
 
     protected ConditionJSONList()
     {}
+
+    public Long getId()
+    {
+        return id;
+    }
+
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
 
     public String getTitle()
     {

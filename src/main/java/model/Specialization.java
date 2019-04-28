@@ -13,7 +13,7 @@ public class Specialization
 
     private String title;
 
-    @OneToMany(mappedBy = "specialization", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Condition> conditions = new HashSet<>();
 
     @ManyToOne
@@ -79,7 +79,23 @@ public class Specialization
         this.university = university;
     }
 
+    public void updateConditionsFromJSON(ConditionJSONList list)
+    {
+        conditions.clear();
 
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj instanceof Specialization && ((Specialization) obj).title.equals(this.title);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id.intValue();
+    }
 
     @Override
     public String toString()

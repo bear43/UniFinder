@@ -32,6 +32,12 @@ public class MainController
         this.conditionService = conditionService;
     }
 
+    @PostMapping("/")
+    public String main(Map<String, Object> model)
+    {
+        return main(model, null);
+    }
+
     @GetMapping("/")
     public String main(Map<String, Object> model, RedirectAttributes attr)
     {
@@ -89,14 +95,79 @@ public class MainController
     }
 
     @PostMapping("/add_condition")
-    public String add_condition(@RequestBody ConditionJSONList specialization, RedirectAttributes attr) throws Exception
+    public String add_condition(@RequestBody ConditionJSONList specialization, RedirectAttributes attr, Map<String, Object> model) throws Exception
     {
-        userService.getCurrentUser().getUniversity().getSpecializations().
+        University university = userService.getCurrentUser().getUniversity();
+        university.getSpecializations().
                 add(specializationService.
                         createFromJSONSpecializationToSpecialization(specialization,
-                                userService.getCurrentUser().getUniversity()));
+                                university));
         userService.saveAndFlush();
         attr.addFlashAttribute("message", "Специальность успешно добавлена!");
-        return "redirect:/add_specialization";
+        model.put("message", "Специальность успешно добавлена!");
+        return "add_specialization";
+    }
+
+    @PostMapping("/change_uni_title")
+    @ResponseBody
+    public String change_uni_title(String title)
+    {
+        University university = userService.getCurrentUser().getUniversity();
+        if(university == null)
+        {
+            return "error: You are not allowed to change university title!";
+        }
+        else
+        {
+            university.setTitle(title);
+            universityService.saveAndFlush(university);
+            return "success: Title changed!";
+        }
+    }
+
+    @GetMapping("/change_spec")
+    public String change_spec(String title, Map<String, Object> model, RedirectAttributes attr)
+    {
+        Specialization specialization = userService.getCurrentUser().getUniversity().getSpecializationByTitle(title);
+        if(specialization == null)
+        {
+            attr.addFlashAttribute("message", "По данному имени специализаций не было найдено.");
+            return "redirect:/";
+        }
+        model.put("spec", specialization);
+        model.put("subjects", subjectService.getSubjectRepository().findAll());
+        return "change_specialization";
+    }
+
+    @PostMapping("/change_condition")
+    public String change_condition(@RequestBody ConditionJSONList spec, Map<String, Object> model, RedirectAttributes attr)
+    {
+        Specialization specialization = specializationService.getSpecializationRepository().findById(spec.getId()).orElse(null);
+        if(specialization == null)
+        {
+            attr.addFlashAttribute("message", "Произошла ошибка. Сервер не смог найти такую специальность");
+            return "redirect:/";
+        }
+        specialization.getConditions().clear();
+        specialization.setTitle(spec.getTitle());
+        Condition condition;
+        for(ConditionJSON cond : spec.getConditions())
+        {
+            try
+            {
+                condition = conditionService.fromJSONConditiontoCondition(cond);
+                condition.setSpecialization(specialization);
+                specialization.getConditions().add(condition);
+            }
+            catch (Exception ex)
+            {
+                attr.addFlashAttribute("message", ex.getMessage());
+                return "redirect:/";
+            }
+        }
+        specializationService.saveAndFlush(specialization);
+        userService.setCurrentUser(userService.getUserRepository().findById(userService.getCurrentUser().getId()).get());
+        attr.addFlashAttribute("message", "Специальность успешно изменена");
+        return "redirect:/";
     }
 }

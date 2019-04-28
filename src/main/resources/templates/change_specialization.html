@@ -42,11 +42,12 @@
     <div th:if="${message} != null">
         [[${message}]]
     </div>
+    <input type="hidden" id="id_spec" th:value="${spec.getId()}"/>
     <label>Название специальности:
-        <input type="text" id="specTitle" name="t" placeholder="Название" min="1" /></label>
+        <input type="text" id="specTitle" name="t" placeholder="Название" min="1" th:value="${spec.getTitle()}" /></label>
     <br/>
     <label id="subjectCount">Количество предметов:
-        <input type="number" id="counter" name="count" placeholder="Количество" min="1" value="1" /></label>
+        <input type="number" id="counter" name="count" placeholder="Количество" min="1" th:value="${spec.getConditions().size()}" /></label>
     <br/>
     <div id="subjectChooseDiv">
         <div class="inst">
@@ -77,27 +78,34 @@
             {
                 template = $(".inst")[0].outerHTML;
                 copied = true;
+                stab($("#counter")[0].value);
             }
         });
-        $("#counter").on("change", function (a)
+
+        function stab(a)
         {
-            if(a.target.value < 1) return;
+            if(a < 1) return;
             if(copied)
             {
-                while(count != a.target.value)
+                while(count != a)
                 {
-                    if (count < a.target.value)
+                    if (count < a)
                     {
                         $(".inst").last().after(template);
                         count++;
                     }
-                    else if (count > a.target.value)
+                    else if (count > a)
                     {
                         $(".inst").last().remove();
                         count--;
                     }
                 }
             }
+        }
+
+        $("#counter").on("change", function (a)
+        {
+            stab(a.target.value);
         })
         $("#add_spec").on("click", function () {
             if ($("#specTitle")[0].value.length === 0) {
@@ -118,10 +126,10 @@
                 arr.push(current);
             }
             $.ajax({
-                url: "/add_condition",
+                url: "/change_condition",
                 type: "POST",
                 data: JSON.stringify({
-                    id: 0,
+                    id: $("#id_spec")[0].value,
                     title: $("#specTitle")[0].value,
                     conditions: arr
                 }),
@@ -132,7 +140,6 @@
                     document.open();
                     document.write(data);
                     document.close();
-                    //document.documentElement.innerHTML = data;
                 }
             });
         });

@@ -51,7 +51,6 @@
                     <thead>
                     <tr>
                         <th class="col-md-3">Название</th>
-                        <th class="col-md-3">Требования</th>
                         <th:block th:each="condition : ${specialization.getConditions()}">
                             <th class="col-md-3" th:text="${condition.getSubject().toString()}"></th>
                         </th:block>

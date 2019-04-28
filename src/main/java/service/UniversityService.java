@@ -1,5 +1,6 @@
 package service;
 
+import model.Specialization;
 import model.University;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,21 @@ public class UniversityService
         universityRepository.saveAndFlush(university);
     }
 
+    public void addSpecialization(University university, Specialization specialization) throws Exception
+    {
+        if(university.isThisSpecialization(specialization))
+            throw new Exception("Specialization " + specialization.getTitle() + "already exists");
+        university.getSpecializations().add(specialization);
+    }
+
     public void deleteUniversity(University university)
     {
         universityRepository.delete(university);
+    }
+
+    public void saveAndFlush(University university)
+    {
+        universityRepository.saveAndFlush(university);
     }
 
     public UniversityRepository getUniversityRepository()

@@ -19,7 +19,7 @@ public class University
 
     private String profile;
 
-    @OneToMany(mappedBy = "university", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "university", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<Specialization> specializations = new HashSet<>();
 
     protected University()
@@ -93,6 +93,25 @@ public class University
     public void setSpecializations(Set<Specialization> specializations)
     {
         this.specializations = specializations;
+    }
+
+    public boolean isThisSpecialization(Specialization specialization)
+    {
+        for(Specialization spec : this.specializations)
+        {
+            if(spec.equals(specialization)) return true;
+        }
+        return false;
+    }
+
+    public Specialization getSpecializationByTitle(String title)
+    {
+        for(Specialization spec : specializations)
+        {
+            if(spec.getTitle().equals(title))
+                return spec;
+        }
+        return null;
     }
 
     @Override

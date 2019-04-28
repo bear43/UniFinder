@@ -44,14 +44,15 @@
         <label class="text-info">[[${message}]]</label>
     </div>
     <div th:if="${user.getUniversity()} != null">
-        <h1 th:text="${user.getUniversity().getTitle()}"></h1>
+        <h1 id="uniTitleText" th:text="${user.getUniversity().getTitle()}">HEX</h1>
+        <input type="edit" id="edit" value="" hidden/>
         <h1>Специализации:</h1>
         <div th:if="${user.getUniversity().getSpecializations() != null and user.getUniversity().getSpecializations().size() != 0}">
             <th:block th:each="specialization : ${user.getUniversity().getSpecializations()}">
                 <table class="table table-hover">
                     <tbody>
                         <tr>
-                            <td class="col-sm-1" th:text="${specialization.getTitle()}"></td>
+                            <td class="col-sm-1 spectitle" th:text="${specialization.getTitle()}"></td>
                             <th:block th:each="condition : ${specialization.getConditions()}">
                                 <td class="col-sm-1" th:if="${condition} != null" th:text="${condition.getSubject().toString()}">Предмет</td>
                                 <td class="col-sm-1" th:if="${condition} != null" th:text="${condition.getPointsCount()}">Баллы</td>
@@ -63,6 +64,34 @@
         </div>
         <a th:href="@{/add_specialization}">Добавить специализацию</a>
     </div>
+    <script>
+        var clicked = false;
+        var oldValue;
+        $("#uniTitleText").on("click", function(){
+            if(!clicked)
+            {
+                $("#uniTitleText").hide();
+                oldValue = $("#uniTitleText")[0].textContent;
+                $("#edit")[0].value = oldValue;
+                $("#edit").show();
+                $("#edit").focus();
+                clicked = true;
+            }
+        });
+        $(window).keydown(function (event)
+        { //ловим событие нажатия клавиши
+            if (event.keyCode == 13 && clicked)
+            { //если это Enter
+                $('#edit').blur(); //снимаем фокус с поля ввода
+                var text = $("#edit")[0].value;
+                $("#edit").hide();
+                $("#uniTitleText")[0].textContent = text;
+                $("#uniTitleText").show();
+                $.post("/change_uni_title", {title: text});
+                clicked = false;
+            }
+        });
+    </script>
     <div th:if="${user.getUniversity()} == null">
         <div id="uniBrowser">
             <table class="table table-hover">
@@ -90,12 +119,19 @@
             <input id="formValue" type="hidden" name="title" />
         </form>
     </div>
+    <form id="fform" th:action="@{/change_spec}" method="get">
+        <input id="ttitle" name="title" type="hidden">
+    </form>
     <script>
         $(".unititle").on("click", function (a)
         {
             var title = a.target.innerText;
             $("#formValue").prop("value", title);
             $("#formOut").submit();
+        });
+        $(".spectitle").on("click", function (a) {
+            $("#ttitle")[0].value = a.target.textContent;
+            $("#fform").submit();
         });
     </script>
 </div>

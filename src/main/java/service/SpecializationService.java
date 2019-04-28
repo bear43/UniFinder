@@ -54,4 +54,9 @@ public class SpecializationService
     {
         return specializationRepository;
     }
+
+    public void saveAndFlush(Specialization specialization)
+    {
+        specializationRepository.saveAndFlush(specialization);
+    }
 }
