@@ -1,5 +1,7 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,11 +12,13 @@ public class Condition
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @JsonBackReference
     private Subject subject;
 
     private int pointsCount;
 
     @ManyToOne
+    @JsonBackReference
     private Specialization specialization;
 
     protected Condition()

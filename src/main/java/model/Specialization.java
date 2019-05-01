@@ -1,5 +1,8 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,9 +17,11 @@ public class Specialization
     private String title;
 
     @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonManagedReference
     private Set<Condition> conditions = new HashSet<>();
 
     @ManyToOne
+    @JsonBackReference
     private University university;
 
     protected Specialization()

@@ -1,12 +1,16 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -169,5 +173,35 @@ public class MainController
         userService.setCurrentUser(userService.getUserRepository().findById(userService.getCurrentUser().getId()).get());
         attr.addFlashAttribute("message", "Специальность успешно изменена");
         return "redirect:/";
+    }
+
+    @PostMapping("/get_all_uni")
+    @ResponseBody
+    public List<University> get_all_uni()
+    {
+        return universityService.getUniversityRepository().findAll();
+    }
+
+    @PostMapping("/get_uni_page")
+    @ResponseBody
+    public List<University> get_uni_page(@RequestBody  Map<String, Integer> params)
+    {
+        Page<University> universities = universityService.getUniversityRepository().
+                findAll(PageRequest.of(params.get("page"), params.get("limit")));
+        return universities.getContent();
+    }
+
+    @PostMapping("/get_total_pages")
+    @ResponseBody
+    public int get_total_pages(@RequestBody Map<String, Integer> param)
+    {
+        return get_total_count()/param.get("limit");
+    }
+
+    @PostMapping("/get_total_count")
+    @ResponseBody
+    public int get_total_count()
+    {
+        return (int)universityService.getUniversityRepository().count();
     }
 }

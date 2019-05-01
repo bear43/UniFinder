@@ -10,8 +10,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--<meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
     <title>Главная страница</title>
 </head>
 <body>
@@ -103,17 +101,20 @@
                     <th class="col-md-3">Профиль</th>
                 </tr>
                 </thead>
-                <tbody>
-                <th:block th:each="university : ${universities}">
+                <tbody id="tableBody">
+                <!--<th:block th:each="university : ${universities}">
                     <tr>
                         <td class="col-md-3 unititle" th:text="${university.getTitle()}"></td>
                         <td class="col-md-3" th:text="${university.getAddress()}"></td>
                         <td class="col-md-3" th:text="${university.getNumber()}"></td>
                         <td class="col-md-3" th:text="${university.getProfile()}"></td>
                     </tr>
-                </th:block>
+                </th:block>-->
                 </tbody>
             </table>
+            <input id="prev_page" type="button" value="Пердыудщая страница"/>
+            <input id="next_page" type="button" value="Следующая страница"/>
+            <label>Элементов на странице: <input id="lim" type="number" value="10" min="1" max="100"/></label>
         </div>
         <form id="formOut" th:action="@{/university_info}" method="post">
             <input id="formValue" type="hidden" name="title" />
@@ -123,15 +124,170 @@
         <input id="ttitle" name="title" type="hidden">
     </form>
     <script>
-        $(".unititle").on("click", function (a)
+    </script>
+    <script>
+        var lim = 10;
+        var uniList;
+        var currentPage = 1;
+        var totalPages = 0;
+        var totalUnis = 0;
+        var isUniMode = false;
+        //Нужно получить все данные ajax запросом
+        async function getPagedUniList(page, limit)
         {
-            var title = a.target.innerText;
-            $("#formValue").prop("value", title);
-            $("#formOut").submit();
-        });
-        $(".spectitle").on("click", function (a) {
-            $("#ttitle")[0].value = a.target.textContent;
-            $("#fform").submit();
+            var locData;
+            await $.ajax({
+                url: "/get_uni_page",
+                type: "POST",
+                data: JSON.stringify({
+                    page: page,
+                    limit: limit
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (data) {
+                    locData = data;
+                }
+            });
+            return locData;
+        }
+        async function getAllUniList()
+        {
+            var locData;
+            await $.ajax({
+                url: "/get_all_uni",
+                type: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (data)
+                {
+                    locData = data;
+                }
+            });
+            return locData;
+        }
+
+        async function getTotalPages(limit)
+        {
+            var locData;
+            await $.ajax({
+                url: "/get_total_pages",
+                type: "POST",
+                data: JSON.stringify({
+                    limit: limit
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (data) {
+                    locData = data;
+                }
+            });
+            return locData;
+        }
+        async function getTotalUnis()
+        {
+            var locData;
+            await $.ajax({
+                url: "/get_total_count",
+                type: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (data) {
+                    locData = data;
+                }
+            });
+            return locData;
+        }
+        function buildUniBrowser(list)
+        {
+            $("#tableBody")[0].innerHTML = "";
+            for(var i in list)
+            {
+                $("#tableBody")[0].
+                innerHTML += "<tr>" +
+                    "<td class='col-md-3 unititle'>" + list[i].title + "</td>" +
+                "<td class='col-md-3'>" + list[i].address + "</td>" +
+                "<td class='col-md-3'>" + list[i].number + "</td>" +
+                "<td class='col-md-3'>" + list[i].profile + "</td>" +
+                    "</tr>";
+            }
+        }
+
+        function hookUniTitle()
+        {
+            $(".unititle").on("click", function (a) {
+                var title = a.target.innerText;
+                $("#formValue").prop("value", title);
+                $("#formOut").submit();
+            });
+        }
+
+        function hook(isUniMode)
+        {
+            if(!isUniMode) {
+                hookUniTitle();
+                $("#lim").on("change", function(){
+                    lim = $("#lim")[0].value;
+                    updateBrowser();
+                });
+                $("#next_page").on("click", function() {
+                    if(currentPage < totalPages) currentPage++;
+                    else currentPage = 1;
+                    updateBrowser();
+                });
+                $("#prev_page").on("click", function() {
+                    if(currentPage > 1) currentPage--;
+                    else if(currentPage < 1) currentPage = 1;
+                    updateBrowser();
+                });
+            }
+            else {
+                $(".spectitle").on("click", function (a) {
+                    $("#ttitle")[0].value = a.target.textContent;
+                    $("#fform").submit();
+                });
+            }
+        }
+
+        async function updateBrowser()
+        {
+            if(isUniMode) return;
+            totalPages = await getTotalPages(lim);
+            totalUnis = await getTotalUnis();
+            if(currentPage > totalPages)
+            {
+                var mod = totalUnis - (totalPages * lim);
+                if (mod > 0)
+                {
+                    uniList = await getPagedUniList(currentPage-1, lim);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                uniList = await getPagedUniList(currentPage - 1, lim);
+            }
+            buildUniBrowser(uniList);
+            hookUniTitle();
+        }
+
+        $(document).ready(async function ()
+        {
+            if(document.getElementsByClassName("spectitle").length !== 0)
+            {
+                isUniMode = true;
+                hook(isUniMode);
+                return;
+            }
+            updateBrowser();
+            hook(isUniMode);
         });
     </script>
 </div>

@@ -1,5 +1,6 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.mapping.Bag;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ public class Subject
     private String title;
 
     @OneToMany(mappedBy = "subject")
+    @JsonManagedReference
     private List<Condition> conditions = new ArrayList<>();
 
     protected Subject()

@@ -44,6 +44,12 @@
         [[${message}]]
     </div>
     <div th:if="${university} != null">
+        <div>
+            <p class="h4" th:text="'Название: ' + ${university.getTitle()}"></p>
+            <p class="h4" th:text="'Адрес: ' + ${university.getAddress()}"></p>
+            <p class="h4" th:text="'Номер телефона: ' + ${university.getNumber()}"></p>
+            <p class="h4" th:text="'Профиль: ' + ${university.getProfile()}"></p>
+        </div>
     <h1>Специализации:</h1>
         <div th:if="${university.getSpecializations()} != null and ${university.getSpecializations().size()} != 0">
             <th:block th:each="specialization : ${university.getSpecializations()}">
