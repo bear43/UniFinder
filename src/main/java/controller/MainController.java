@@ -204,4 +204,11 @@ public class MainController
     {
         return (int)universityService.getUniversityRepository().count();
     }
+
+    @PostMapping("/get_uni_score")
+    @ResponseBody
+    public List<University> get_uni_score(@RequestBody Map<String, Integer> params)
+    {
+        return universityService.getUniListBySpecScore(params.get("total_spec_score"));
+    }
 }

@@ -115,6 +115,9 @@
             <input id="prev_page" type="button" value="Пердыудщая страница"/>
             <input id="next_page" type="button" value="Следующая страница"/>
             <label>Элементов на странице: <input id="lim" type="number" value="10" min="1" max="100"/></label>
+            <br/>
+            <label>Фильтр по количеству баллов на специальность: <input id="maxTotalScore" type="number" placeholder="Максимальное кол-во баллов" min="1" max="1000"/></label>
+            <input id="maxTotalScoreButton" type="button" value="Искать">
         </div>
         <form id="formOut" th:action="@{/university_info}" method="post">
             <input id="formValue" type="hidden" name="title" />
@@ -166,6 +169,26 @@
                     locData = data;
                 }
             });
+            return locData;
+        }
+
+        async function getFiltredUniList(score)
+        {
+            var locData;
+            await $.ajax({
+            url: "/get_uni_score",
+            type: "POST",
+            data: JSON.stringify({
+                total_spec_score: score
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (data)
+            {
+                locData = data;
+            }
+        });
             return locData;
         }
 
@@ -232,17 +255,21 @@
                 hookUniTitle();
                 $("#lim").on("change", function(){
                     lim = $("#lim")[0].value;
-                    updateBrowser();
+                    updateBrowser(true);
                 });
                 $("#next_page").on("click", function() {
                     if(currentPage < totalPages) currentPage++;
                     else currentPage = 1;
-                    updateBrowser();
+                    updateBrowser(true);
                 });
                 $("#prev_page").on("click", function() {
                     if(currentPage > 1) currentPage--;
                     else if(currentPage < 1) currentPage = 1;
-                    updateBrowser();
+                    updateBrowser(true);
+                });
+                $("#maxTotalScoreButton").on("click", async function(){
+                    uniList = await getFiltredUniList($("#maxTotalScore")[0].value);
+                    updateBrowser(false);
                 });
             }
             else {
@@ -253,9 +280,8 @@
             }
         }
 
-        async function updateBrowser()
+        async function receiveData()
         {
-            if(isUniMode) return;
             totalPages = await getTotalPages(lim);
             totalUnis = await getTotalUnis();
             if(currentPage > totalPages)
@@ -274,6 +300,12 @@
             {
                 uniList = await getPagedUniList(currentPage - 1, lim);
             }
+        }
+
+        async function updateBrowser(upd)
+        {
+            if(isUniMode) return;
+            if(upd === true) await receiveData();
             buildUniBrowser(uniList);
             hookUniTitle();
         }
@@ -286,7 +318,7 @@
                 hook(isUniMode);
                 return;
             }
-            updateBrowser();
+            updateBrowser(true);
             hook(isUniMode);
         });
     </script>
